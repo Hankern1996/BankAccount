@@ -1,5 +1,7 @@
 package com.example.hannahkern.bankaccount;
 
+import java.util.UUID;
+
 /**
  * Created by hannahkern on 18.04.18.
  */
@@ -9,6 +11,11 @@ public class Person {
     private String name;
     private String passwort;
     private String accountnr;
+    private UUID id;
+
+    public UUID getId(){
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -54,7 +61,7 @@ public class Person {
     private String withdraw;
 
 
-    public Person(String name, String passwort, String accountnr, String balance) {
+    public Person() {
         this.name = name;
         this.passwort = passwort;
         this.accountnr = accountnr;

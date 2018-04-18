@@ -25,13 +25,26 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     private static final String COLUMN_USER_BALANCE = "user_balance";
 
     private String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_USER + "("
-            + COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_USER_NAME + " TEXT," + COLUMN_USER_PASSWORD + " TEXT" + ")";
+            + COLUMN_USER_ID + " 1," +
+            COLUMN_USER_NAME + " hannah," + COLUMN_USER_PASSWORD + " 1234" +
+            COLUMN_USER_BALANCE + "10000" + ")";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    public String[] getBalance(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {
+                COLUMN_USER_BALANCE
+        };
 
+        Cursor cursor = db.query(DatabaseHelper.TABLE_USER,
+                columns, DatabaseHelper.COLUMN_USER_ID + "= 1" ,
+                null, null, null, null);
+
+        return columns;
+    }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -47,18 +60,20 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     }
 
+
     public void addUser(Person person) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_USER_NAME, "hannah");
-        values.put(COLUMN_USER_PASSWORD, "1234");
-        values.put(COLUMN_USER_BALANCE, "100000");
+        values.put(COLUMN_USER_NAME, person.getName());
+        values.put(COLUMN_USER_PASSWORD, person.getPasswort());
+        values.put(COLUMN_USER_BALANCE, person.getBalance());
 
         // Inserting Row
         db.insert(TABLE_USER, null, values);
         db.close();
     }
+
     public List<Person> getAllUser() {
         // array of columns to fetch
         String[] columns = {
@@ -100,7 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         return userList;
     }
 
-    public boolean checkUser(String email) {
+    public boolean checkUser(String name) {
 
         // array of columns to fetch
         String[] columns = {
@@ -109,10 +124,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getReadableDatabase();
 
         // selection criteria
-        String selection = COLUMN_USER_EMAIL + " = ?";
+        String selection = COLUMN_USER_NAME + " = ?";
 
         // selection argument
-        String[] selectionArgs = {email};
+        String[] selectionArgs = {name};
 
         // query user table with condition
         /**
@@ -131,6 +146,44 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         cursor.close();
         db.close();
 
+        if (cursorCount > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean checkUser(String name, String password) {
+
+        // array of columns to fetch
+        String[] columns = {
+                COLUMN_USER_ID
+        };
+        SQLiteDatabase db = this.getReadableDatabase();
+        // selection criteria
+        String selection = COLUMN_USER_NAME + " = ?" + " AND " + COLUMN_USER_PASSWORD + " = ?";
+
+        // selection arguments
+        String[] selectionArgs = {name, password};
+
+        // query user table with conditions
+        /**
+         * Here query function is used to fetch records from user table this function works like we use sql query.
+         * SQL query equivalent to this query function is
+         * SELECT user_id FROM user WHERE user_email = 'jack@androidtutorialshub.com' AND user_password = 'qwerty';
+         */
+        Cursor cursor = db.query(TABLE_USER, //Table to query
+                columns,                    //columns to return
+                selection,                  //columns for the WHERE clause
+                selectionArgs,              //The values for the WHERE clause
+                null,                       //group the rows
+                null,                       //filter by row groups
+                null);                      //The sort order
+
+        int cursorCount = cursor.getCount();
+
+        cursor.close();
+        db.close();
         if (cursorCount > 0) {
             return true;
         }
