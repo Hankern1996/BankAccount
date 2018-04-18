@@ -2,6 +2,7 @@ package com.example.hannahkern.bankaccount;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -55,5 +56,35 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.insert(TABLE_USER, null, values);
         db.close();
     }
+    SQLiteDatabase db = this.getReadableDatabase();
 
+    public boolean checkUser(String email) {
+
+        // array of columns to fetch
+        String[] columns = {
+                COLUMN_USER_ID
+        };
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+
+
+
+        Cursor cursor = db.query(TABLE_USER, //Table to query
+                columns,                    //columns to return
+                selection,                  //columns for the WHERE clause
+                selectionArgs,              //The values for the WHERE clause
+                null,                       //group the rows
+                null,                      //filter by row groups
+                null);                      //The sort order
+        int cursorCount = cursor.getCount();
+        cursor.close();
+        db.close();
+
+        if (cursorCount > 0) {
+            return true;
+        }
+
+        return false;
+    }
 }
